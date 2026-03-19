@@ -1,45 +1,576 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solar Budget Test</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SolarBudget — Économisez avec l'énergie solaire</title>
+  <meta name="description" content="Découvrez comment réduire votre facture d'électricité grâce aux panneaux solaires. Guides, comparatifs et conseils d'experts pour passer au solaire.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sun: #F5A623;
+      --sun-deep: #E8890A;
+      --sky: #0A1628;
+      --sky-mid: #112240;
+      --sky-light: #1D3461;
+      --white: #FAFAF8;
+      --muted: #8899AA;
+      --card-bg: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--sky);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(10,22,40,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 6vw;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900;
+      color: var(--sun);
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.9rem;
+      font-weight: 500; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--sun); color: var(--sky);
+      padding: 0.5rem 1.2rem; border-radius: 6px;
+      font-weight: 600; font-size: 0.85rem;
+      text-decoration: none; transition: background .2s;
+    }
+    .nav-cta:hover { background: var(--sun-deep); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 80px 6vw 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 70% 40%, rgba(245,166,35,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { max-width: 620px; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3);
+      color: var(--sun); padding: 0.35rem 0.9rem; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 900; line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 em { color: var(--sun); font-style: normal; }
+    .hero p {
+      color: #A0B4C8; font-size: 1.1rem;
+      max-width: 500px; margin-bottom: 2rem;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--sun); color: var(--sky);
+      padding: 0.8rem 1.8rem; border-radius: 8px;
+      font-weight: 700; font-size: 1rem;
+      text-decoration: none; transition: all .2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--sun-deep); transform: translateY(-2px); }
+    .btn-secondary {
+      border: 1px solid var(--border); color: var(--white);
+      padding: 0.8rem 1.8rem; border-radius: 8px;
+      font-weight: 500; font-size: 1rem;
+      text-decoration: none; transition: all .2s;
+      display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--sun); color: var(--sun); }
+
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 3rem;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+    }
+    .stat-item { }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 700; color: var(--sun);
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .hero-visual {
+      position: absolute; right: 4vw; top: 50%;
+      transform: translateY(-50%);
+      width: min(420px, 40vw);
+      opacity: 0.9;
+    }
+    .sun-graphic {
+      width: 100%; aspect-ratio: 1;
+      background: radial-gradient(circle, rgba(245,166,35,0.25) 0%, rgba(245,166,35,0.05) 50%, transparent 70%);
+      border-radius: 50%;
+      position: relative;
+      animation: pulse 4s ease-in-out infinite;
+    }
+    .sun-graphic::after {
+      content: '☀️';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(4rem, 10vw, 8rem);
+      filter: drop-shadow(0 0 40px rgba(245,166,35,0.6));
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* ── SECTION GÉNÉRIQUE ── */
+    section { padding: 80px 6vw; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--sun); margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700; line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .section-sub { color: var(--muted); max-width: 560px; font-size: 1rem; }
+
+    /* ── AVANTAGES ── */
+    .avantages { background: var(--sky-mid); }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.8rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .card:hover { border-color: rgba(245,166,35,0.4); transform: translateY(-4px); }
+    .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; }
+
+    /* ── GUIDE ── */
+    .guide-steps { margin-top: 3rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .step {
+      display: flex; gap: 1.5rem; align-items: flex-start;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem;
+    }
+    .step-num {
+      background: var(--sun); color: var(--sky);
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+    }
+    .step-content h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .step-content p { color: var(--muted); font-size: 0.9rem; }
+
+    /* ── ÉLIGIBILITÉ CTA ── */
+    .eligibilite {
+      background: linear-gradient(135deg, var(--sky-light) 0%, var(--sky-mid) 100%);
+      text-align: center;
+    }
+    .eligibilite-box {
+      max-width: 680px; margin: 0 auto;
+      background: var(--card-bg); border: 1px solid rgba(245,166,35,0.25);
+      border-radius: 16px; padding: 3rem 2rem;
+    }
+    .eligibilite-box h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 700; margin-bottom: 1rem;
+    }
+    .eligibilite-box p { color: var(--muted); margin-bottom: 2rem; }
+    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1rem; }
+    .form-row select, .form-row input {
+      background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+      color: var(--white); padding: 0.75rem 1rem; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      min-width: 200px;
+    }
+    .form-row select option { background: var(--sky-mid); }
+    .disclaimer { font-size: 0.75rem; color: var(--muted); margin-top: 1rem; }
+
+    /* ── ARTICLES ── */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .article-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      transition: border-color .2s, transform .2s;
+    }
+    .article-card:hover { border-color: rgba(245,166,35,0.3); transform: translateY(-3px); }
+    .article-thumb {
+      height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+    }
+    .article-thumb.t1 { background: linear-gradient(135deg, #1a3a2a, #0d2218); }
+    .article-thumb.t2 { background: linear-gradient(135deg, #2a1a0a, #3d2710); }
+    .article-thumb.t3 { background: linear-gradient(135deg, #0a1a3a, #0d2040); }
+    .article-body { padding: 1.2rem; }
+    .article-tag {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--sun); margin-bottom: 0.5rem;
+    }
+    .article-body h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; line-height: 1.4; }
+    .article-body p { color: var(--muted); font-size: 0.85rem; }
+    .article-footer {
+      padding: 0 1.2rem 1.2rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .read-more { color: var(--sun); font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+    .read-more:hover { text-decoration: underline; }
+    .read-date { color: var(--muted); font-size: 0.75rem; }
+
+    /* ── FAQ ── */
+    .faq { background: var(--sky-mid); }
+    .faq-list { max-width: 720px; margin-top: 2.5rem; }
+    .faq-item {
+      border-bottom: 1px solid var(--border); padding: 1.2rem 0;
+    }
+    .faq-q {
+      font-weight: 600; font-size: 1rem; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-q::after { content: '+'; color: var(--sun); font-size: 1.3rem; }
+    .faq-a { color: var(--muted); font-size: 0.9rem; margin-top: 0.7rem; line-height: 1.7; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #060F1E; padding: 3rem 6vw 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem;
+      margin-bottom: 2rem;
+    }
+    .footer-brand p { color: var(--muted); font-size: 0.9rem; margin-top: 0.8rem; max-width: 300px; }
+    .footer-col h4 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .footer-col a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color .2s; }
+    .footer-col a:hover { color: var(--sun); }
+    .footer-bottom {
+      padding-top: 1.5rem; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.8rem; color: var(--muted);
+    }
+    .footer-bottom a { color: var(--muted); text-decoration: none; }
+
+    @media (max-width: 768px) {
+      .hero-visual { display: none; }
+      .hero-stats { gap: 1.5rem; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .nav-links { display: none; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <img src="assets/logo.webp" alt="Logo Solar Test" class="logo">
-        <h1>Solar Budget Test</h1>
-        <p>Page de test pour afficher vos kits TradeDoubler</p>
-    </header>
 
-    <main>
-        <section class="kit">
-            <h2>Campagne Panneaux Solaires</h2>
-            <p>Testez votre éligibilité aux aides solaires.</p>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Solar<span>Budget</span></div>
+    <ul class="nav-links">
+      <li><a href="#avantages">Avantages</a></li>
+      <li><a href="#guide">Comment ça marche</a></li>
+      <li><a href="#articles">Guides</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a href="#eligibilite" class="nav-cta">Vérifier mon éligibilité</a>
+  </nav>
 
-            <!-- Bouton tracké TradeDoubler (remplace avec ton lien) -->
-            <a href="https://clk.tradedoubler.com/click?p=MERCHANT_ID&a=AFFILIATE_ID&g=CAMPAIGN_ID" target="_blank">
-                <button>Vérifier maintenant</button>
-            </a>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">⚡ Énergie renouvelable</div>
+      <h1>Réduisez votre facture avec <em>l'énergie solaire</em></h1>
+      <p>Comparez les meilleures offres de panneaux solaires, découvrez les aides disponibles et faites des économies durables sur votre consommation électrique.</p>
+      <div class="hero-actions">
+        <a href="#eligibilite" class="btn-primary">Vérifier mon éligibilité →</a>
+        <a href="#guide" class="btn-secondary">Comment ça marche</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">-70%</div>
+          <div class="stat-label">Sur la facture annuelle</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">8 ans</div>
+          <div class="stat-label">Retour sur investissement</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">25 ans</div>
+          <div class="stat-label">Durée de vie des panneaux</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="sun-graphic"></div>
+    </div>
+  </section>
 
-            <!-- Pixel d'impression TradeDoubler (remplace avec ton lien) -->
-            <!-- <img src="https://imp.tradedoubler.com/imp?type(img)g=&a=AFFILIATE_ID" width="0" height="0" alt="Pixel Tracking"> -->
-        </section>
+  <!-- AVANTAGES -->
+  <section class="avantages" id="avantages">
+    <div class="section-label">Pourquoi passer au solaire</div>
+    <h2 class="section-title">Une énergie propre, économique et indépendante</h2>
+    <p class="section-sub">Les panneaux solaires représentent aujourd'hui l'investissement le plus rentable pour les propriétaires souhaitant réduire leur dépendance énergétique.</p>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-icon">💰</div>
+        <h3>Économies immédiates</h3>
+        <p>Dès la première année, constatez une réduction significative de votre facture d'électricité pouvant aller jusqu'à 70%.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏛️</div>
+        <h3>Aides de l'État</h3>
+        <p>Bénéficiez de primes à l'autoconsommation, de la TVA réduite à 10% et d'autres subventions selon votre région.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌱</div>
+        <h3>Éco-responsable</h3>
+        <p>Réduisez votre empreinte carbone et contribuez activement à la transition énergétique de votre territoire.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📈</div>
+        <h3>Valorisation immobilière</h3>
+        <p>Un logement équipé de panneaux solaires voit sa valeur augmenter de 5 à 15% sur le marché immobilier.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔋</div>
+        <h3>Revente du surplus</h3>
+        <p>L'électricité non consommée peut être revendue à EDF OA, vous générant un revenu complémentaire régulier.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚙️</div>
+        <h3>Maintenance minimale</h3>
+        <p>Les installations solaires sont conçues pour durer 25 ans avec un entretien quasi-nul et une garantie constructeur.</p>
+      </div>
+    </div>
+  </section>
 
-        <!-- Tu peux ajouter plusieurs kits ici -->
-        <section class="kit">
-            <h2>Campagne Exemple 2</h2>
-            <p>Exemple de kit pour tester le tracking TradeDoubler.</p>
-            <a href="https://clk.tradedoubler.com/click?p=MERCHANT_ID2&a=AFFILIATE_ID&g=CAMPAIGN_ID2" target="_blank">
-                <button>Voir maintenant</button>
-            </a>
-            <!-- <img src="https://imp.tradedoubler.com/imp?type(img)g=CAMPAIGN_ID2&a=AFFILIATE_ID" width="0" height="0" alt="Pixel Tracking"> -->
-        </section>
-    </main>
+  <!-- GUIDE -->
+  <section id="guide">
+    <div class="section-label">Le parcours en 5 étapes</div>
+    <h2 class="section-title">De la décision à l'installation en toute simplicité</h2>
+    <p class="section-sub">Nous vous accompagnons à chaque étape de votre projet solaire, de la simulation jusqu'à la mise en service.</p>
+    <div class="guide-steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Simulez votre projet</h3>
+          <p>Renseignez votre adresse, votre consommation annuelle et la surface disponible pour obtenir une estimation personnalisée de vos économies potentielles.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Comparez les offres</h3>
+          <p>Recevez jusqu'à 5 devis de notre réseau d'installateurs certifiés RGE dans votre région pour choisir la meilleure offre qualité/prix.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Montez votre dossier d'aides</h3>
+          <p>Nos experts vous guident dans le montage de votre dossier pour bénéficier de toutes les aides financières auxquelles vous avez droit.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Installation par un professionnel</h3>
+          <p>Un installateur certifié réalise les travaux en une à deux journées selon la configuration de votre toiture et la puissance installée.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>Profitez de votre énergie gratuite</h3>
+          <p>Dès la mise en service, votre installation produit de l'électricité en toute autonomie. Suivez votre production depuis votre smartphone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <footer>
-        <p>&copy; 2026 Solar Budget Test. Page de démonstration.</p>
-    </footer>
+  <!-- ÉLIGIBILITÉ -->
+  <section class="eligibilite" id="eligibilite">
+    <div class="eligibilite-box">
+      <h2>Vérifiez votre éligibilité aux aides solaires</h2>
+      <p>En moins de 2 minutes, découvrez les subventions disponibles dans votre département et estimez vos économies annuelles.</p>
+      <div class="form-row">
+        <select>
+          <option value="">Votre département</option>
+          <option>75 — Paris</option>
+          <option>69 — Rhône</option>
+          <option>13 — Bouches-du-Rhône</option>
+          <option>33 — Gironde</option>
+          <option>31 — Haute-Garonne</option>
+          <option>Autre département</option>
+        </select>
+        <select>
+          <option value="">Type de logement</option>
+          <option>Maison individuelle</option>
+          <option>Appartement</option>
+          <option>Maison en copropriété</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <input type="number" placeholder="Facture annuelle estimée (€)" min="0" />
+        <select>
+          <option value="">Surface de toiture</option>
+          <option>Moins de 20 m²</option>
+          <option>20 à 40 m²</option>
+          <option>Plus de 40 m²</option>
+        </select>
+      </div>
+      <a href="#" class="btn-primary" style="font-size:1rem; padding: 0.9rem 2.5rem;">
+        Calculer mes économies gratuitement →
+      </a>
+      <p class="disclaimer">Service gratuit et sans engagement. Vos données sont protégées conformément au RGPD.</p>
+    </div>
+  </section>
+
+  <!-- ARTICLES -->
+  <section id="articles">
+    <div class="section-label">Ressources & guides</div>
+    <h2 class="section-title">Tout savoir avant de se lancer</h2>
+    <p class="section-sub">Nos experts décryptent pour vous les aspects techniques, financiers et administratifs du passage au solaire.</p>
+    <div class="articles-grid">
+      <div class="article-card">
+        <div class="article-thumb t1">🌿</div>
+        <div class="article-body">
+          <div class="article-tag">Financement</div>
+          <h3>Les aides de l'État pour les panneaux solaires en 2026</h3>
+          <p>Prime à l'autoconsommation, TVA réduite, éco-PTZ... tour d'horizon complet des dispositifs disponibles.</p>
+        </div>
+        <div class="article-footer">
+          <a href="#" class="read-more">Lire l'article →</a>
+          <span class="read-date">15 mars 2026</span>
+        </div>
+      </div>
+      <div class="article-card">
+        <div class="article-thumb t2">☀️</div>
+        <div class="article-body">
+          <div class="article-tag">Guide pratique</div>
+          <h3>Quelle puissance choisir pour votre installation solaire ?</h3>
+          <p>3 kWc, 6 kWc ou 9 kWc ? Apprenez à dimensionner votre installation en fonction de votre consommation réelle.</p>
+        </div>
+        <div class="article-footer">
+          <a href="#" class="read-more">Lire l'article →</a>
+          <span class="read-date">8 mars 2026</span>
+        </div>
+      </div>
+      <div class="article-card">
+        <div class="article-thumb t3">⚡</div>
+        <div class="article-body">
+          <div class="article-tag">Technique</div>
+          <h3>Batterie de stockage solaire : est-ce rentable en 2026 ?</h3>
+          <p>Analyse coûts/bénéfices des solutions de stockage pour maximiser votre autoconsommation solaire.</p>
+        </div>
+        <div class="article-footer">
+          <a href="#" class="read-more">Lire l'article →</a>
+          <span class="read-date">1 mars 2026</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="section-label">Questions fréquentes</div>
+    <h2 class="section-title">Vos questions, nos réponses</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Faut-il être propriétaire pour installer des panneaux solaires ?</div>
+        <div class="faq-a">Oui, il est nécessaire d'être propriétaire de votre logement ou d'avoir l'accord du propriétaire et de la copropriété pour réaliser une installation solaire. Les locataires peuvent toutefois bénéficier de solutions de location ou d'autoconsommation collective.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Combien de temps dure une installation de panneaux solaires ?</div>
+        <div class="faq-a">Une installation standard pour une maison individuelle se réalise en une à deux journées. Les démarches administratives (demande de raccordement, contrat d'injection) peuvent prendre entre 4 et 8 semaines supplémentaires.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Que se passe-t-il lors d'une coupure de courant ?</div>
+        <div class="faq-a">En cas de coupure réseau, les installations classiques s'éteignent par sécurité. Pour bénéficier d'une alimentation de secours, il faut opter pour un onduleur "îlotable" couplé à une batterie de stockage.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Quelle est la durée de vie réelle d'un panneau solaire ?</div>
+        <div class="faq-a">Les panneaux photovoltaïques modernes ont une durée de vie estimée à 25-30 ans. Leur rendement diminue légèrement chaque année (environ 0,5%), mais ils restent performants bien au-delà de la période de garantie constructeur.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Est-il possible de revendre l'électricité produite ?</div>
+        <div class="faq-a">Oui, via un contrat d'obligation d'achat avec EDF OA, vous pouvez revendre votre surplus ou la totalité de votre production à un tarif garanti pendant 20 ans par l'État, offrant ainsi une visibilité financière à long terme.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">Solar<span>Budget</span></div>
+        <p>Votre guide indépendant pour réussir votre projet solaire. Comparatifs, guides et mise en relation avec des installateurs certifiés.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="#">Guide débutant</a></li>
+          <li><a href="#">Comparatif panneaux</a></li>
+          <li><a href="#">Simulateur d'économies</a></li>
+          <li><a href="#">Aides & subventions</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>À propos</h4>
+        <ul>
+          <li><a href="#">Qui sommes-nous</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Mentions légales</a></li>
+          <li><a href="#">Politique de confidentialité</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 SolarBudget — Tous droits réservés</span>
+      <span>Site indépendant — Certains liens sont des liens affiliés</span>
+    </div>
+  </footer>
+
 </body>
 </html>
